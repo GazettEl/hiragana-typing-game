@@ -256,6 +256,9 @@ function resetStats() {
 }
 
 function startGame() {
+  if (!state.kanaData || !state.kanaData.length) { alert('No hay datos de hiragana cargados. Abre el juego desde un servidor (no file://) o asegúrate de que data/hiragana.js existe.'); return; }
+  buildPool();
+  if (!state.pool.length) { alert('No hay kana en el conjunto seleccionado. Ajusta la dificultad.'); return; }
   resetStats();
   state.startedAt = Date.now();
   state.endedAt = 0;
@@ -325,6 +328,7 @@ function renderHighscores(list) {
 function nextRound() {
   fillUpcoming();
   state.current = state.upcoming.shift();
+  if (!state.current) { alert('No hay más ítems en la cola.'); endGame(); return; }
   els.game.kana.textContent = state.current.kana;
   els.game.answer.value = "";
   els.game.answer.placeholder = state.lastKana ? `${state.lastKana} → ${state.lastRoman}` : "romanización...";
@@ -510,6 +514,8 @@ async function init() {
 
   // load data
   try {
+    // If opened as file://, skip fetch to avoid CORS and use JS fallback
+    if (location.protocol === 'file:') throw new Error('file protocol');
     const res = await fetch("./data/hiragana.json");
     state.kanaData = await res.json();
   } catch (e) {
@@ -530,10 +536,15 @@ async function init() {
 
   buildPool();
   showScreen(els.screens.start);
+  els.start.startBtn.disabled = false;
   if (!localStorage.getItem(STORAGE_KEYS.onboard)) showOnboard();
 
   // start handlers
   els.start.startBtn.addEventListener("click", () => {
+    // Hide onboarding if still open
+    if (els.onboard.root && !els.onboard.root.classList.contains('hidden')) {
+      els.onboard.root.classList.add('hidden');
+    }
     state.mode = els.start.mode.value;
     state.difficulty = els.start.difficulty.value;
     state.permissive = els.start.permissive.checked;

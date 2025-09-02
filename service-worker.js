@@ -1,5 +1,6 @@
 // Simple offline-first service worker
-const CACHE_NAME = "hiragana-rush-v1";
+const CACHE_NAME = "hiragana-rush-v2";
+self.addEventListener("install", () => self.skipWaiting());
 const ASSETS = [
   "./",
   "./index.html",
