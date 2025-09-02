@@ -1,0 +1,745 @@
+window.HIRAGANA_DATA = [
+  {
+    "kana": "あ",
+    "roma": [
+      "a"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "い",
+    "roma": [
+      "i"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "う",
+    "roma": [
+      "u"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "え",
+    "roma": [
+      "e"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "お",
+    "roma": [
+      "o"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "か",
+    "roma": [
+      "ka"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "き",
+    "roma": [
+      "ki"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "く",
+    "roma": [
+      "ku"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "け",
+    "roma": [
+      "ke"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "こ",
+    "roma": [
+      "ko"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "さ",
+    "roma": [
+      "sa"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "し",
+    "roma": [
+      "shi",
+      "si"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "す",
+    "roma": [
+      "su"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "せ",
+    "roma": [
+      "se"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "そ",
+    "roma": [
+      "so"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "た",
+    "roma": [
+      "ta"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "ち",
+    "roma": [
+      "chi",
+      "ti"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "つ",
+    "roma": [
+      "tsu",
+      "tu"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "て",
+    "roma": [
+      "te"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "と",
+    "roma": [
+      "to"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "な",
+    "roma": [
+      "na"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "に",
+    "roma": [
+      "ni"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "ぬ",
+    "roma": [
+      "nu"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "ね",
+    "roma": [
+      "ne"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "の",
+    "roma": [
+      "no"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "は",
+    "roma": [
+      "ha"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "ひ",
+    "roma": [
+      "hi"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "ふ",
+    "roma": [
+      "fu",
+      "hu"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "へ",
+    "roma": [
+      "he"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "ほ",
+    "roma": [
+      "ho"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "ま",
+    "roma": [
+      "ma"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "み",
+    "roma": [
+      "mi"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "む",
+    "roma": [
+      "mu"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "め",
+    "roma": [
+      "me"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "も",
+    "roma": [
+      "mo"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "や",
+    "roma": [
+      "ya"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "ゆ",
+    "roma": [
+      "yu"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "よ",
+    "roma": [
+      "yo"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "ら",
+    "roma": [
+      "ra"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "り",
+    "roma": [
+      "ri"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "る",
+    "roma": [
+      "ru"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "れ",
+    "roma": [
+      "re"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "ろ",
+    "roma": [
+      "ro"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "わ",
+    "roma": [
+      "wa"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "を",
+    "roma": [
+      "o",
+      "wo"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "ん",
+    "roma": [
+      "n",
+      "nn"
+    ],
+    "level": "easy"
+  },
+  {
+    "kana": "が",
+    "roma": [
+      "ga"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ぎ",
+    "roma": [
+      "gi"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ぐ",
+    "roma": [
+      "gu"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "げ",
+    "roma": [
+      "ge"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ご",
+    "roma": [
+      "go"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ざ",
+    "roma": [
+      "za"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "じ",
+    "roma": [
+      "ji",
+      "zi"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ず",
+    "roma": [
+      "zu"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ぜ",
+    "roma": [
+      "ze"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ぞ",
+    "roma": [
+      "zo"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "だ",
+    "roma": [
+      "da"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ぢ",
+    "roma": [
+      "ji",
+      "di"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "づ",
+    "roma": [
+      "zu",
+      "du"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "で",
+    "roma": [
+      "de"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ど",
+    "roma": [
+      "do"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ば",
+    "roma": [
+      "ba"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "び",
+    "roma": [
+      "bi"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ぶ",
+    "roma": [
+      "bu"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "べ",
+    "roma": [
+      "be"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ぼ",
+    "roma": [
+      "bo"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ぱ",
+    "roma": [
+      "pa"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ぴ",
+    "roma": [
+      "pi"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ぷ",
+    "roma": [
+      "pu"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ぺ",
+    "roma": [
+      "pe"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "ぽ",
+    "roma": [
+      "po"
+    ],
+    "level": "medium"
+  },
+  {
+    "kana": "きゃ",
+    "roma": [
+      "kya"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "きゅ",
+    "roma": [
+      "kyu"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "きょ",
+    "roma": [
+      "kyo"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "しゃ",
+    "roma": [
+      "sha",
+      "sya"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "しゅ",
+    "roma": [
+      "shu",
+      "syu"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "しょ",
+    "roma": [
+      "sho",
+      "syo"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "ちゃ",
+    "roma": [
+      "cha",
+      "tya"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "ちゅ",
+    "roma": [
+      "chu",
+      "tyu"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "ちょ",
+    "roma": [
+      "cho",
+      "tyo"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "にゃ",
+    "roma": [
+      "nya"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "にゅ",
+    "roma": [
+      "nyu"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "にょ",
+    "roma": [
+      "nyo"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "ひゃ",
+    "roma": [
+      "hya"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "ひゅ",
+    "roma": [
+      "hyu"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "ひょ",
+    "roma": [
+      "hyo"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "みゃ",
+    "roma": [
+      "mya"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "みゅ",
+    "roma": [
+      "myu"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "みょ",
+    "roma": [
+      "myo"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "りゃ",
+    "roma": [
+      "rya"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "りゅ",
+    "roma": [
+      "ryu"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "りょ",
+    "roma": [
+      "ryo"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "ぎゃ",
+    "roma": [
+      "gya"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "ぎゅ",
+    "roma": [
+      "gyu"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "ぎょ",
+    "roma": [
+      "gyo"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "じゃ",
+    "roma": [
+      "ja"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "じゅ",
+    "roma": [
+      "ju"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "じょ",
+    "roma": [
+      "jo"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "びゃ",
+    "roma": [
+      "bya"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "びゅ",
+    "roma": [
+      "byu"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "びょ",
+    "roma": [
+      "byo"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "ぴゃ",
+    "roma": [
+      "pya"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "ぴゅ",
+    "roma": [
+      "pyu"
+    ],
+    "level": "hard"
+  },
+  {
+    "kana": "ぴょ",
+    "roma": [
+      "pyo"
+    ],
+    "level": "hard"
+  }
+];
