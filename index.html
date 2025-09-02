@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hiragana Rush — Typing Trainer</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="theme-color" content="#0b0f14" />
+    <meta name="description" content="Juego rápido para practicar Hiragana. Escribe la romanización antes de que el tiempo se acabe." />
+  </head>
+  <body>
+    <main class="container">
+      <!-- Start Screen -->
+      <section id="screen-start" class="screen">
+        <h1>Hiragana Rush</h1>
+        <p class="muted">Escribe la romanización correcta antes de que el tiempo llegue a cero.</p>
+
+        <div class="card settings">
+          <div class="row">
+            <label for="mode">Modo</label>
+            <select id="mode">
+              <option value="survival">Supervivencia (3 vidas)</option>
+              <option value="time">Contrarreloj (60s)</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label for="difficulty">Dificultad</label>
+            <select id="difficulty">
+              <option value="easy">Fácil (gojūon básico)</option>
+              <option value="medium">Medio (+ dakuten / handakuten)</option>
+              <option value="hard">Difícil (+ yōon きゃ, しゃ, ちゃ...)</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label for="timePerChar">Tiempo por carácter</label>
+            <select id="timePerChar">
+              <option value="6">6 s</option>
+              <option value="8">8 s</option>
+              <option value="10" selected>10 s</option>
+              <option value="12">12 s</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label class="switch">
+              <input type="checkbox" id="permissive" checked />
+              <span class="slider"></span>
+            </label>
+            <span>Permisivo (acepta equivalencias: shi/si, chi/ti, tsu/tu...)</span>
+          </div>
+          <div class="row">
+            <label class="switch">
+              <input type="checkbox" id="soundEnabled" checked />
+              <span class="slider"></span>
+            </label>
+            <span>Sonidos (acierto/fallo)</span>
+          </div>
+
+          <div class="row">
+            <label for="theme">Tema</label>
+            <select id="theme">
+              <option value="auto" selected>Auto (según sistema)</option>
+              <option value="dark">Oscuro</option>
+              <option value="light">Claro</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="btn-start" class="primary">Comenzar</button>
+
+        <details class="notes">
+          <summary>Cómo publicar en GitHub Pages</summary>
+          <ol>
+            <li>Sube estos archivos a un repo: <code>index.html</code>, <code>styles.css</code>, <code>main.js</code>, <code>data/hiragana.json</code>.</li>
+            <li>En <em>Settings → Pages</em>, selecciona la rama (<em>main</em>) y carpeta <code>/root</code>.</li>
+            <li>Espera a que GitHub Pages publique y abre la URL. (Ruta relativa, funciona también en subcarpeta).</li>
+          </ol>
+        </details>
+      </section>
+
+      <!-- Game Screen -->
+      <section id="screen-game" class="screen hidden">
+        <header class="hud">
+          <div class="stat"><span class="label">Puntos</span><span id="score">0</span></div>
+          <div class="stat"><span class="label">Combo</span><span id="combo">0</span></div>
+          <div class="stat"><span class="label" id="livesLabel">Vidas</span><span id="lives">3</span></div>
+          <div class="stat" id="timeBox" hidden><span class="label">Tiempo</span><span id="timeLeft">60</span>s</div>
+        </header>
+
+        <div class="timer">
+          <div id="timerFill"></div>
+        </div>
+
+        <div class="play">
+          <div id="kana" class="kana">あ</div>
+          <input id="answer" class="answer" type="text" autocomplete="off" placeholder="romanización..." />
+          <div id="feedback" class="feedback muted"></div>
+        </div>
+
+        <footer class="controls">
+          <button id="btn-quit" class="ghost">Salir</button>
+        </footer>
+      </section>
+
+      <!-- Result Screen -->
+      <section id="screen-result" class="screen hidden">
+        <h2>Resultado</h2>
+        <div class="card results">
+          <div><span class="label">Puntos</span><span id="rScore">0</span></div>
+          <div><span class="label">Aciertos</span><span id="rHits">0</span></div>
+          <div><span class="label">Fallos</span><span id="rMiss">0</span></div>
+          <div><span class="label">Precisión</span><span id="rAcc">0%</span></div>
+          <div><span class="label">Combo máximo</span><span id="rCombo">0</span></div>
+          <div><span class="label">Tiempo jugado</span><span id="rTime">0s</span></div>
+        </div>
+
+        <h3>Top 5 (local)</h3>
+        <ol id="highscores" class="hiscore"></ol>
+
+        <div class="actions">
+          <button id="btn-retry" class="primary">Reintentar</button>
+          <button id="btn-home" class="ghost">Inicio</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="./main.js" defer></script>
+      <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("./service-worker.js").catch(console.error);
+        });
+      }
+    </script>
+</body>
+</html>
