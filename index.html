@@ -21,7 +21,7 @@
             <label for="mode">Modo</label>
             <select id="mode">
               <option value="survival">Supervivencia (3 vidas)</option>
-              <option value="time">Contrarreloj (60s)</option>
+              <option value="time">Contrarreloj (personalizable)</option>
             </select>
           </div>
 
@@ -42,6 +42,11 @@
               <option value="10" selected>10 s</option>
               <option value="12">12 s</option>
             </select>
+          </div>
+
+          <div class="row" id="timeAttackRow" hidden>
+            <label for="timeAttackTotal">Tiempo total (s)</label>
+            <input id="timeAttackTotal" type="number" min="10" max="300" step="10" value="60" />
           </div>
 
           <div class="row">
