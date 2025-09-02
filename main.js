@@ -105,15 +105,16 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const now = () => performance.now();
 const normalize = (s) => s.toLowerCase().trim();
 
+// Human friendly "time ago" in Spanish
 function timeAgo(ts) {
+  const plural = (n, s, p) => `${n} ${n === 1 ? s : p}`;
   const sec = Math.floor((Date.now() - ts) / 1000);
-  const r = (n, u) => `${n} ${u}${n !== 1 ? 's' : ''}`;
-  if (sec < 60) return `hace ${r(sec, 's')}`;
-  const min = Math.floor(sec / 60); if (min < 60) return `hace ${r(min, 'min')}`;
-  const hr = Math.floor(min / 60); if (hr < 24) return `hace ${r(hr, 'h')}`;
-  const day = Math.floor(hr / 24); if (day < 30) return `hace ${r(day, 'd')}`;
-  const mon = Math.floor(day / 30); if (mon < 12) return `hace ${r(mon, 'mes')}`;
-  const yr = Math.floor(mon / 12); return `hace ${r(yr, 'año')}`;
+  if (sec < 60) return `hace ${plural(sec, 'segundo', 'segundos')}`;
+  const min = Math.floor(sec / 60); if (min < 60) return `hace ${plural(min, 'minuto', 'minutos')}`;
+  const hr = Math.floor(min / 60); if (hr < 24) return `hace ${plural(hr, 'hora', 'horas')}`;
+  const day = Math.floor(hr / 24); if (day < 30) return `hace ${plural(day, 'día', 'días')}`;
+  const mon = Math.floor(day / 30); if (mon < 12) return `hace ${plural(mon, 'mes', 'meses')}`;
+  const yr = Math.floor(mon / 12); return `hace ${plural(yr, 'año', 'años')}`;
 }
 
 // -------------- Audio (WebAudio minimal) --------------
