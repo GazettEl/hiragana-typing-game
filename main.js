@@ -1,4 +1,4 @@
-// Hiragana Rush — vanilla JS
+// Hiragana Rush — vanilla JS with improved UI/UX
 // Works on GitHub Pages (static). Uses relative fetch for ./data/hiragana.json
 
 const $ = (sel) => document.querySelector(sel);
@@ -18,6 +18,7 @@ const els = {
     timeAttackRow: $("#timeAttackRow"),
     permissive: $("#permissive"),
     soundEnabled: $("#soundEnabled"),
+    showQueue: $("#showQueue"),
     theme: $("#theme"),
     startBtn: $("#btn-start"),
   },
@@ -31,8 +32,10 @@ const els = {
     timerFill: $("#timerFill"),
     kana: $("#kana"),
     answer: $("#answer"),
-    feedback: $("#feedback"),
+    queue: $("#nextQueue"),
+    toast: $("#toast"),
     quitBtn: $("#btn-quit"),
+    pauseOverlay: $("#pauseOverlay"),
   },
   result: {
     score: $("#rScore"),
@@ -44,13 +47,22 @@ const els = {
     highscores: $("#highscores"),
     retry: $("#btn-retry"),
     home: $("#btn-home"),
+  },
+  onboard: {
+    root: $("#onboard"),
+    step1: $("#onboardStep1"),
+    step2: $("#onboardStep2"),
+    next: $("#onboardNext"),
+    done: $("#onboardDone"),
+    skip: $("#onboardSkip"),
   }
 };
 
 const STORAGE_KEYS = {
-  settings: "htg_settings_v2",
-  scores: "htg_highscores_v1",
+  settings: "htg_settings_v3",
+  scores: "htg_highscores_v2",
   theme: "htg_theme_v1",
+  onboard: "htg_onboard_v1",
 };
 
 const state = {
@@ -60,9 +72,11 @@ const state = {
   timePerChar: 10,           // seconds
   timeAttackTotal: 60,       // seconds
   livesStart: 3,
+  showQueue: false,
 
   pool: [],
   kanaData: [],
+  upcoming: [],
   current: null,
   score: 0,
   combo: 0,
@@ -72,6 +86,8 @@ const state = {
   misses: 0,
   startedAt: 0,
   endedAt: 0,
+  lastKana: "",
+  lastRoman: "",
 
   // timers
   charDeadline: 0,
@@ -85,6 +101,21 @@ const state = {
 };
 
 // -------------- Utils --------------
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const now = () => performance.now();
+const normalize = (s) => s.toLowerCase().trim();
+
+function timeAgo(ts) {
+  const sec = Math.floor((Date.now() - ts) / 1000);
+  const r = (n, u) => `${n} ${u}${n !== 1 ? 's' : ''}`;
+  if (sec < 60) return `hace ${r(sec, 's')}`;
+  const min = Math.floor(sec / 60); if (min < 60) return `hace ${r(min, 'min')}`;
+  const hr = Math.floor(min / 60); if (hr < 24) return `hace ${r(hr, 'h')}`;
+  const day = Math.floor(hr / 24); if (day < 30) return `hace ${r(day, 'd')}`;
+  const mon = Math.floor(day / 30); if (mon < 12) return `hace ${r(mon, 'mes')}`;
+  const yr = Math.floor(mon / 12); return `hace ${r(yr, 'año')}`;
+}
+
 // -------------- Audio (WebAudio minimal) --------------
 const audio = {
   ctx: null,
@@ -122,10 +153,6 @@ function loadTheme() {
   try { return localStorage.getItem(STORAGE_KEYS.theme) || 'auto'; } catch { return 'auto'; }
 }
 
-const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-const now = () => performance.now();
-const normalize = (s) => s.toLowerCase().trim();
-
 function saveSettings() {
   const payload = {
     mode: state.mode,
@@ -135,8 +162,9 @@ function saveSettings() {
     timeAttackTotal: state.timeAttackTotal,
     soundEnabled: audio.enabled,
     theme: loadTheme(),
+    showQueue: state.showQueue,
   };
-  localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(payload));
+  try { localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(payload)); } catch {}
 }
 
 function loadSettings() {
@@ -148,6 +176,7 @@ function loadSettings() {
     if (cfg.timePerChar) state.timePerChar = Number(cfg.timePerChar);
     if (cfg.timeAttackTotal) state.timeAttackTotal = Number(cfg.timeAttackTotal);
     if (typeof cfg.soundEnabled === "boolean") audio.enabled = cfg.soundEnabled;
+    if (typeof cfg.showQueue === "boolean") state.showQueue = cfg.showQueue;
   } catch {}
 }
 
@@ -161,10 +190,10 @@ function saveHighscore(entry) {
   try { db = JSON.parse(localStorage.getItem(STORAGE_KEYS.scores) || "{}"); } catch {}
   const key = hsKey();
   const list = Array.isArray(db[key]) ? db[key] : [];
-  list.push(entry);
+  list.push({ ...entry, ts: Date.now() });
   list.sort((a,b) => b.score - a.score);
-  db[key] = list.slice(0, 5);
-  localStorage.setItem(STORAGE_KEYS.scores, JSON.stringify(db));
+  db[key] = list.slice(0,5);
+  try { localStorage.setItem(STORAGE_KEYS.scores, JSON.stringify(db)); } catch {}
   return db[key];
 }
 
@@ -172,9 +201,7 @@ function getHighscores() {
   try {
     const db = JSON.parse(localStorage.getItem(STORAGE_KEYS.scores) || "{}");
     return db[hsKey()] || [];
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 }
 
 // Select a random item
@@ -190,6 +217,19 @@ function buildPool() {
       ? ["easy", "medium"]
       : ["easy", "medium", "hard"];
   state.pool = state.kanaData.filter(k => levels.includes(k.level));
+}
+
+// Fill upcoming queue to 4 items
+function fillUpcoming() {
+  while (state.upcoming.length < 4) {
+    state.upcoming.push(sample(state.pool));
+  }
+}
+
+function updateQueue() {
+  if (!state.showQueue) { els.game.queue.hidden = true; return; }
+  els.game.queue.hidden = false;
+  els.game.queue.innerHTML = state.upcoming.slice(0,3).map(k => `<span>${k.kana}</span>`).join("");
 }
 
 // -------------- Screens --------------
@@ -208,6 +248,9 @@ function resetStats() {
   state.lives = state.livesStart;
   state.hits = 0;
   state.misses = 0;
+  state.upcoming = [];
+  state.lastKana = "";
+  state.lastRoman = "";
   updateHUD();
 }
 
@@ -228,6 +271,7 @@ function startGame() {
     tickGlobal();
   }
 
+  fillUpcoming();
   nextRound();
   showScreen(els.screens.game);
   els.game.answer.focus();
@@ -257,7 +301,6 @@ function endGame() {
     comboMax: state.comboMax,
     hits: state.hits,
     misses: state.misses,
-    date: new Date().toISOString()
   });
   renderHighscores(hs);
 
@@ -272,18 +315,21 @@ function renderHighscores(list) {
   }
   list.forEach((e, i) => {
     const li = document.createElement("li");
-    li.textContent = `#${i+1} — ${e.score} pts · ${e.acc}% · combo ${e.comboMax}`;
+    const when = timeAgo(e.ts);
+    li.innerHTML = `#${i+1} — ${e.score} pts · ${e.acc}% · combo ${e.comboMax} <span class="muted">(${when})</span>`;
     els.result.highscores.appendChild(li);
   });
 }
 
 function nextRound() {
-  const item = sample(state.pool);
-  state.current = item;
-  els.game.kana.textContent = item.kana;
+  fillUpcoming();
+  state.current = state.upcoming.shift();
+  els.game.kana.textContent = state.current.kana;
   els.game.answer.value = "";
-  els.game.feedback.textContent = "";
-  els.game.feedback.className = "feedback muted";
+  els.game.answer.placeholder = state.lastKana ? `${state.lastKana} → ${state.lastRoman}` : "romanización...";
+  els.game.toast.textContent = "";
+  els.game.toast.className = "toast";
+  updateQueue();
 
   // start char timer
   state.remainingCharMs = state.timePerChar * 1000;
@@ -293,12 +339,12 @@ function nextRound() {
 
 function tickChar() {
   cancelAnimationFrame(state.rafId);
-  const pct = clamp((state.charDeadline - now()) / (state.timePerChar * 1000), 0, 1);
+  const remain = state.charDeadline - now();
+  const pct = clamp(remain / (state.timePerChar * 1000), 0, 1);
   els.game.timerFill.style.transform = `scaleX(${pct})`;
-  if (pct <= 0) {
-    onTimeout();
-    return;
-  }
+  if (remain <= 2000) els.game.timerFill.classList.add('warn');
+  else els.game.timerFill.classList.remove('warn');
+  if (pct <= 0) { onTimeout(); return; }
   state.rafId = requestAnimationFrame(tickChar);
 }
 
@@ -310,19 +356,26 @@ function tickGlobal() {
   state.rafGlobalId = requestAnimationFrame(tickGlobal);
 }
 
+function showToast(msg, type = "info") {
+  els.game.toast.textContent = msg;
+  els.game.toast.className = `toast show ${type}`;
+  setTimeout(() => {
+    els.game.toast.className = "toast";
+    els.game.toast.textContent = "";
+  }, 800);
+}
+
 function onTimeout() { audio.timeout();
-  // Wrong
   state.misses += 1;
   state.combo = 0;
-  els.game.feedback.textContent = `${state.current.kana} → ${state.current.roma[0]}`;
-  els.game.feedback.className = "feedback bad";
-  // Life loss only in survival
+  state.lastKana = state.current.kana;
+  state.lastRoman = state.current.roma[0];
+  showToast(`${state.current.kana} → ${state.current.roma[0]}`, 'bad');
   if (state.mode === "survival") {
     state.lives -= 1;
     if (state.lives <= 0) { updateHUD(); endGame(); return; }
   }
   updateHUD();
-  // next
   nextRound();
 }
 
@@ -330,13 +383,11 @@ function onCorrect() { audio.good();
   state.hits += 1;
   state.combo += 1;
   state.comboMax = Math.max(state.comboMax, state.combo);
-  // points with small multiplier per 10 combo
   const mult = 1 + Math.floor(state.combo / 10);
   state.score += 1 * mult;
-
-  els.game.feedback.textContent = "¡Bien!";
-  els.game.feedback.className = "feedback good";
-
+  state.lastKana = state.current.kana;
+  state.lastRoman = state.current.roma[0];
+  showToast('¡Bien!', 'good');
   updateHUD();
   nextRound();
 }
@@ -344,8 +395,9 @@ function onCorrect() { audio.good();
 function onWrong() { audio.bad();
   state.misses += 1;
   state.combo = 0;
-  els.game.feedback.textContent = `Ups… ${state.current.kana} → ${state.current.roma[0]}`;
-  els.game.feedback.className = "feedback bad";
+  state.lastKana = state.current.kana;
+  state.lastRoman = state.current.roma[0];
+  showToast(`${state.current.kana} → ${state.current.roma[0]}`, 'bad');
   if (state.mode === "survival") {
     state.lives -= 1;
     if (state.lives <= 0) { updateHUD(); endGame(); return; }
@@ -364,7 +416,6 @@ function updateHUD() {
 
 // -------------- Input handling --------------
 function acceptableRomanizations(item) {
-  // If strict, only the first; else all provided.
   return state.permissive ? item.roma : [item.roma[0]];
 }
 
@@ -384,7 +435,7 @@ function onEnterConfirm() {
   else onWrong();
 }
 
-// -------------- Pause on tab hide --------------
+// -------------- Pause handling --------------
 function pauseTimers() {
   if (state.paused) return;
   state.paused = true;
@@ -407,26 +458,42 @@ function resumeTimers() {
     tickGlobal();
   }
 }
+function togglePause() {
+  if (!state.paused) {
+    pauseTimers();
+    els.game.pauseOverlay.classList.remove('hidden');
+  } else {
+    els.game.pauseOverlay.classList.add('hidden');
+    resumeTimers();
+    els.game.answer.focus();
+  }
+}
+
+// -------------- Onboarding --------------
+function showOnboard() {
+  els.onboard.root.classList.remove('hidden');
+  els.onboard.step1.classList.remove('hidden');
+  els.onboard.step2.classList.add('hidden');
+}
 
 // -------------- Wiring --------------
 async function init() {
   loadSettings();
 
   // apply settings to UI
-  // Theme
   applyTheme(loadTheme());
   els.start.theme.value = loadTheme();
-
-  // Apply settings to UI (sound)
   els.start.soundEnabled.checked = audio.enabled;
+  els.start.showQueue.checked = state.showQueue;
 
   // Clicking start unlocks audio context on user gesture
   const unlockAudio = () => { audio.init(); document.removeEventListener('click', unlockAudio); };
   document.addEventListener('click', unlockAudio, { once: true });
 
-  // Change handlers for theme & sound
+  // Change handlers
   els.start.theme.addEventListener('change', (e) => applyTheme(e.target.value));
   els.start.soundEnabled.addEventListener('change', (e) => { audio.enabled = e.target.checked; saveSettings(); });
+  els.start.showQueue.addEventListener('change', (e) => { state.showQueue = e.target.checked; saveSettings(); });
 
   els.start.mode.value = state.mode;
   els.start.difficulty.value = state.difficulty;
@@ -455,6 +522,7 @@ async function init() {
 
   buildPool();
   showScreen(els.screens.start);
+  if (!localStorage.getItem(STORAGE_KEYS.onboard)) showOnboard();
 
   // start handlers
   els.start.startBtn.addEventListener("click", () => {
@@ -463,6 +531,7 @@ async function init() {
     state.permissive = els.start.permissive.checked;
     state.timePerChar = Number(els.start.timePerChar.value);
     state.timeAttackTotal = Number(els.start.timeAttackTotal.value);
+    state.showQueue = els.start.showQueue.checked;
     applyTheme(els.start.theme.value);
     audio.enabled = els.start.soundEnabled.checked;
     saveSettings();
@@ -495,6 +564,31 @@ async function init() {
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) pauseTimers();
     else resumeTimers();
+  });
+
+  // global key shortcuts
+  document.addEventListener('keydown', (e) => {
+    if (!els.screens.game.classList.contains('hidden')) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        togglePause();
+      } else if (e.key === '/' && document.activeElement !== els.game.answer) {
+        e.preventDefault();
+        els.game.answer.focus();
+      }
+    }
+  });
+
+  // onboarding events
+  els.onboard.next.addEventListener('click', () => {
+    els.onboard.step1.classList.add('hidden');
+    els.onboard.step2.classList.remove('hidden');
+  });
+  els.onboard.done.addEventListener('click', () => {
+    if (els.onboard.skip.checked) {
+      try { localStorage.setItem(STORAGE_KEYS.onboard, '1'); } catch {}
+    }
+    els.onboard.root.classList.add('hidden');
   });
 }
 

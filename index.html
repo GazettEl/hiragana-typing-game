@@ -13,16 +13,19 @@
     <main class="container">
       <!-- Start Screen -->
       <section id="screen-start" class="screen">
-        <h1>Hiragana Rush</h1>
-        <p class="muted">Escribe la romanización correcta antes de que el tiempo llegue a cero.</p>
+        <header class="hero">
+          <h1>Hiragana Rush</h1>
+          <p class="tagline">aprende + compite</p>
+        </header>
 
         <div class="card settings">
           <div class="row">
             <label for="mode">Modo</label>
             <select id="mode">
               <option value="survival">Supervivencia (3 vidas)</option>
-              <option value="time">Contrarreloj (personalizable)</option>
+              <option value="time">Contrarreloj</option>
             </select>
+            <small class="hint">Elige entre vidas limitadas o tiempo total.</small>
           </div>
 
           <div class="row">
@@ -32,6 +35,7 @@
               <option value="medium">Medio (+ dakuten / handakuten)</option>
               <option value="hard">Difícil (+ yōon きゃ, しゃ, ちゃ...)</option>
             </select>
+            <small class="hint">Añade más kana para subir el reto.</small>
           </div>
 
           <div class="row">
@@ -42,39 +46,49 @@
               <option value="10" selected>10 s</option>
               <option value="12">12 s</option>
             </select>
+            <small class="hint">Tiempo límite para cada kana.</small>
           </div>
 
           <div class="row" id="timeAttackRow" hidden>
             <label for="timeAttackTotal">Tiempo total (s)</label>
             <input id="timeAttackTotal" type="number" min="10" max="300" step="10" value="60" />
+            <small class="hint">Disponible en Contrarreloj.</small>
           </div>
 
-          <div class="row">
+          <div class="row inline">
             <label class="switch">
               <input type="checkbox" id="permissive" checked />
               <span class="slider"></span>
             </label>
-            <span>Permisivo (acepta equivalencias: shi/si, chi/ti, tsu/tu...)</span>
+            <span>Permisivo (shi/si, chi/ti...)</span>
           </div>
-          <div class="row">
+          <div class="row inline">
             <label class="switch">
               <input type="checkbox" id="soundEnabled" checked />
               <span class="slider"></span>
             </label>
-            <span>Sonidos (acierto/fallo)</span>
+            <span>Sonidos</span>
+          </div>
+          <div class="row inline">
+            <label class="switch">
+              <input type="checkbox" id="showQueue" />
+              <span class="slider"></span>
+            </label>
+            <span>Mostrar cola</span>
           </div>
 
           <div class="row">
             <label for="theme">Tema</label>
             <select id="theme">
-              <option value="auto" selected>Auto (según sistema)</option>
+              <option value="auto" selected>Auto</option>
               <option value="dark">Oscuro</option>
               <option value="light">Claro</option>
             </select>
+            <small class="hint">Seguir sistema o forzar tema.</small>
           </div>
         </div>
 
-        <button id="btn-start" class="primary">Comenzar</button>
+        <button id="btn-start" class="primary start-fixed">Comenzar</button>
       </section>
 
       <!-- Game Screen -->
@@ -90,15 +104,25 @@
           <div id="timerFill"></div>
         </div>
 
+        <div id="nextQueue" class="queue" hidden></div>
+
         <div class="play">
           <div id="kana" class="kana">あ</div>
-          <input id="answer" class="answer" type="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="latin" placeholder="romanización..." />
-          <div id="feedback" class="feedback muted"></div>
+          <p id="inputHint" class="sr-only">Escribe la romanización y presiona Enter para validar.</p>
+          <input id="answer" class="answer" type="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="latin" placeholder="romanización..." aria-describedby="inputHint" />
+          <div id="toast" class="toast" role="status" aria-live="polite"></div>
         </div>
 
         <footer class="controls">
           <button id="btn-quit" class="ghost">Salir</button>
         </footer>
+
+        <div id="pauseOverlay" class="overlay hidden" role="dialog" aria-modal="true">
+          <div class="modal">
+            <p>Pausa</p>
+            <small>Presiona Esc para continuar</small>
+          </div>
+        </div>
       </section>
 
       <!-- Result Screen -->
@@ -123,13 +147,27 @@
       </section>
     </main>
 
+    <div id="onboard" class="overlay hidden" role="dialog" aria-modal="true">
+      <div class="modal">
+        <div id="onboardStep1" class="onboard-step">
+          <p>Escribe la romanización usando letras latinas. Ej: し → shi</p>
+          <button id="onboardNext" class="primary">Siguiente</button>
+        </div>
+        <div id="onboardStep2" class="onboard-step hidden">
+          <p>Cada carácter tiene un límite de tiempo. En Supervivencia tienes 3 vidas.</p>
+          <label class="row inline"><input type="checkbox" id="onboardSkip" /> No volver a mostrar</label>
+          <button id="onboardDone" class="primary">Listo</button>
+        </div>
+      </div>
+    </div>
+
     <script src="./main.js" defer></script>
-      <script>
+    <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker.register("./service-worker.js").catch(console.error);
         });
       }
     </script>
-</body>
+  </body>
 </html>
