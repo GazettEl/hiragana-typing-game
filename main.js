@@ -14,6 +14,8 @@ const els = {
     mode: $("#mode"),
     difficulty: $("#difficulty"),
     timePerChar: $("#timePerChar"),
+    timeAttackTotal: $("#timeAttackTotal"),
+    timeAttackRow: $("#timeAttackRow"),
     permissive: $("#permissive"),
     soundEnabled: $("#soundEnabled"),
     theme: $("#theme"),
@@ -130,6 +132,7 @@ function saveSettings() {
     difficulty: state.difficulty,
     permissive: state.permissive,
     timePerChar: state.timePerChar,
+    timeAttackTotal: state.timeAttackTotal,
     soundEnabled: audio.enabled,
     theme: loadTheme(),
   };
@@ -143,12 +146,14 @@ function loadSettings() {
     if (cfg.difficulty) state.difficulty = cfg.difficulty;
     if (typeof cfg.permissive === "boolean") state.permissive = cfg.permissive;
     if (cfg.timePerChar) state.timePerChar = Number(cfg.timePerChar);
+    if (cfg.timeAttackTotal) state.timeAttackTotal = Number(cfg.timeAttackTotal);
     if (typeof cfg.soundEnabled === "boolean") audio.enabled = cfg.soundEnabled;
   } catch {}
 }
 
 function hsKey() {
-  return `${state.mode}-${state.difficulty}-${state.timePerChar}s`;
+  const base = `${state.mode}-${state.difficulty}-${state.timePerChar}s`;
+  return (state.mode === "time") ? `${base}-${state.timeAttackTotal}s` : base;
 }
 
 function saveHighscore(entry) {
@@ -427,6 +432,13 @@ async function init() {
   els.start.difficulty.value = state.difficulty;
   els.start.permissive.checked = state.permissive;
   els.start.timePerChar.value = String(state.timePerChar);
+  els.start.timeAttackTotal.value = String(state.timeAttackTotal);
+
+  const updateTimeRow = () => {
+    els.start.timeAttackRow.hidden = (els.start.mode.value !== "time");
+  };
+  updateTimeRow();
+  els.start.mode.addEventListener('change', updateTimeRow);
 
   // load data
   try {
@@ -450,6 +462,7 @@ async function init() {
     state.difficulty = els.start.difficulty.value;
     state.permissive = els.start.permissive.checked;
     state.timePerChar = Number(els.start.timePerChar.value);
+    state.timeAttackTotal = Number(els.start.timeAttackTotal.value);
     applyTheme(els.start.theme.value);
     audio.enabled = els.start.soundEnabled.checked;
     saveSettings();
