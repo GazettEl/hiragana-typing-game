@@ -514,11 +514,18 @@ async function init() {
     state.kanaData = await res.json();
   } catch (e) {
     console.error("Error cargando hiragana.json", e);
-    alert("No se pudo cargar data/hiragana.json");
-    state.kanaData = [];
+    if (window.HIRAGANA_DATA) {
+      state.kanaData = window.HIRAGANA_DATA;
+    } else {
+      alert("No se pudo cargar data/hiragana.json");
+      els.start.startBtn.disabled = true;
+      return;
+    }
   }
   if (!state.kanaData.length) {
-    throw new Error("No hay datos de hiragana");
+    els.start.startBtn.disabled = true;
+    alert("No hay datos de hiragana");
+    return;
   }
 
   buildPool();
