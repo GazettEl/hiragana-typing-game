@@ -4,59 +4,61 @@
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
-const els = {
-  screens: {
-    start: $("#screen-start"),
-    game: $("#screen-game"),
-    result: $("#screen-result"),
-  },
-  start: {
-    mode: $("#mode"),
-    difficulty: $("#difficulty"),
-    timePerChar: $("#timePerChar"),
-    timeAttackTotal: $("#timeAttackTotal"),
-    timeAttackRow: $("#timeAttackRow"),
-    permissive: $("#permissive"),
-    soundEnabled: $("#soundEnabled"),
-    showQueue: $("#showQueue"),
-    theme: $("#theme"),
-    startBtn: $("#btn-start"),
-  },
-  game: {
-    score: $("#score"),
-    combo: $("#combo"),
-    lives: $("#lives"),
-    livesLabel: $("#livesLabel"),
-    timeBox: $("#timeBox"),
-    timeLeft: $("#timeLeft"),
-    timerFill: $("#timerFill"),
-    kana: $("#kana"),
-    answer: $("#answer"),
-    queue: $("#nextQueue"),
-    toast: $("#toast"),
-    quitBtn: $("#btn-quit"),
-    pauseOverlay: $("#pauseOverlay"),
-  },
-  result: {
-    score: $("#rScore"),
-    hits: $("#rHits"),
-    miss: $("#rMiss"),
-    acc: $("#rAcc"),
-    combo: $("#rCombo"),
-    time: $("#rTime"),
-    highscores: $("#highscores"),
-    retry: $("#btn-retry"),
-    home: $("#btn-home"),
-  },
-  onboard: {
-    root: $("#onboard"),
-    step1: $("#onboardStep1"),
-    step2: $("#onboardStep2"),
-    next: $("#onboardNext"),
-    done: $("#onboardDone"),
-    skip: $("#onboardSkip"),
-  }
-};
+let els;
+function bindEls() {
+  els = {
+    screens: {
+      start: $("#screen-start"),
+      game: $("#screen-game"),
+      result: $("#screen-result"),
+    },
+    start: {
+      mode: $("#mode"),
+      difficulty: $("#difficulty"),
+      timePerChar: $("#timePerChar"),
+      timeAttackTotal: $("#timeAttackTotal"),
+      timeAttackRow: $("#timeAttackRow"),
+      permissive: $("#permissive"),
+      soundEnabled: $("#soundEnabled"),
+      showQueue: $("#showQueue"),
+      startBtn: $("#btn-start"),
+    },
+    game: {
+      score: $("#score"),
+      combo: $("#combo"),
+      lives: $("#lives"),
+      livesLabel: $("#livesLabel"),
+      timeBox: $("#timeBox"),
+      timeLeft: $("#timeLeft"),
+      timerFill: $("#timerFill"),
+      kana: $("#kana"),
+      answer: $("#answer"),
+      queue: $("#nextQueue"),
+      toast: $("#toast"),
+      quitBtn: $("#btn-quit"),
+      pauseOverlay: $("#pauseOverlay"),
+    },
+    result: {
+      score: $("#rScore"),
+      hits: $("#rHits"),
+      miss: $("#rMiss"),
+      acc: $("#rAcc"),
+      combo: $("#rCombo"),
+      time: $("#rTime"),
+      highscores: $("#highscores"),
+      retry: $("#btn-retry"),
+      home: $("#btn-home"),
+    },
+    onboard: {
+      root: $("#onboard"),
+      step1: $("#onboardStep1"),
+      step2: $("#onboardStep2"),
+      next: $("#onboardNext"),
+      done: $("#onboardDone"),
+      skip: $("#onboardSkip"),
+    }
+  };
+}
 
 const STORAGE_KEYS = {
   settings: "htg_settings_v3",
@@ -143,17 +145,6 @@ const audio = {
   timeout() { this.beep(110, 220, 'sawtooth', 0.05); },
 };
 
-// -------------- Theme handling --------------
-function applyTheme(mode) {
-  const html = document.documentElement;
-  if (!['auto','dark','light'].includes(mode)) mode = 'auto';
-  html.setAttribute('data-theme', mode);
-  try { localStorage.setItem(STORAGE_KEYS.theme, mode); } catch {}
-}
-function loadTheme() {
-  try { return localStorage.getItem(STORAGE_KEYS.theme) || 'auto'; } catch { return 'auto'; }
-}
-
 function saveSettings() {
   const payload = {
     mode: state.mode,
@@ -162,7 +153,6 @@ function saveSettings() {
     timePerChar: state.timePerChar,
     timeAttackTotal: state.timeAttackTotal,
     soundEnabled: audio.enabled,
-    theme: loadTheme(),
     showQueue: state.showQueue,
   };
   try { localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(payload)); } catch {}
@@ -483,11 +473,10 @@ function showOnboard() {
 
 // -------------- Wiring --------------
 async function init() {
+  bindEls();
   loadSettings();
 
   // apply settings to UI
-  applyTheme(loadTheme());
-  els.start.theme.value = loadTheme();
   els.start.soundEnabled.checked = audio.enabled;
   els.start.showQueue.checked = state.showQueue;
 
@@ -496,7 +485,6 @@ async function init() {
   document.addEventListener('click', unlockAudio, { once: true });
 
   // Change handlers
-  els.start.theme.addEventListener('change', (e) => applyTheme(e.target.value));
   els.start.soundEnabled.addEventListener('change', (e) => { audio.enabled = e.target.checked; saveSettings(); });
   els.start.showQueue.addEventListener('change', (e) => { state.showQueue = e.target.checked; saveSettings(); });
 
@@ -551,7 +539,6 @@ async function init() {
     state.timePerChar = Number(els.start.timePerChar.value);
     state.timeAttackTotal = Number(els.start.timeAttackTotal.value);
     state.showQueue = els.start.showQueue.checked;
-    applyTheme(els.start.theme.value);
     audio.enabled = els.start.soundEnabled.checked;
     saveSettings();
     buildPool();
@@ -611,4 +598,9 @@ async function init() {
   });
 }
 
-window.addEventListener("DOMContentLoaded", init);
+
+function setGameMode(mode){
+  state.mode = mode;
+}
+
+window.game = { init, setGameMode };
