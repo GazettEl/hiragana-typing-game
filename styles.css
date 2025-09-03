@@ -108,7 +108,7 @@ button, input, select {
 }
 .row { display:flex; flex-direction:column; margin: var(--space-sm) 0; }
 .row.inline { flex-direction:row; align-items:center; }
-.row.inline label { margin-right:12px; width:auto; }
+.row.inline label { margin-right:12px; flex-shrink:0; }
 .row.inline span { flex:1; }
 .row label { color: var(--muted); }
 .row .hint { margin-top:4px; color: var(--muted); font-size:.85rem; }
