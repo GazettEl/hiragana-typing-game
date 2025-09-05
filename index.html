@@ -1,98 +1,316 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Hiragana Rush</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <!-- Botón hamburguesa -->
-  <button id="menuToggle"
-          class="hamburger"
-          aria-controls="sideMenu"
-          aria-expanded="false"
-          aria-label="Abrir menú de modos">☰</button>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JP Practice — Hiragana Typing</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside id="sidebar" class="sidebar" aria-label="Menú lateral">
+        <div class="sidebar__header">
+          <span class="brand">JP Practice</span>
+        </div>
 
-  <!-- Drawer lateral -->
-  <aside id="sideMenu"
-         class="drawer"
-         role="dialog"
-         aria-modal="true"
-         aria-label="Selecciona el modo de juego">
-    <header class="drawer-header">
-      <h2>Modos de juego</h2>
-      <button id="closeMenu" class="icon-btn" aria-label="Cerrar menú">×</button>
-    </header>
-    <nav class="drawer-nav">
-      <button class="modeBtn" data-mode="clasic">Clásico</button>
-      <button class="modeBtn" data-mode="timeAttack">Time Attack</button>
-      <button class="modeBtn" data-mode="practice">Práctica</button>
-      <button class="modeBtn" data-mode="custom">Personalizado</button>
-    </nav>
-  </aside>
+        <nav class="sidebar__nav" aria-label="Secciones del menú">
+          <section class="menu-section">
+            <h2 class="menu-title">Modos</h2>
+            <ul class="menu-list">
+              <li><a href="#" id="mode-classic" class="menu-link">Básico</a></li>
+              <li><a href="#" class="menu-link">Contrarreloj</a></li>
+              <li><a href="#" class="menu-link">Supervivencia</a></li>
+            </ul>
+          </section>
 
-  <!-- Backdrop -->
-  <div id="backdrop" class="backdrop" hidden></div>
+          <section class="menu-section" id="config-section">
+            <h2 class="menu-title">Configuración</h2>
+            <div class="menu-text">Usa el boton "Configurar practica" en la parte superior.</div>
+          </section>
 
-  <main class="container">
-    <h1 id="pageTitle">Hiragana Rush</h1>
-    <p class="subtitle">aprende + compite</p>
+          <section class="menu-section">
+            <h2 class="menu-title">Estadísticas</h2>
+            <ul class="menu-list">
+              <li class="menu-text">Mejor puntaje: —</li>
+              <li class="menu-text">Precisión: —</li>
+              <li class="menu-text">Sesiones: —</li>
+            </ul>
+          </section>
+        </nav>
 
-    <h2 class="section-title">
-      <span id="current-mode-label">Clásico</span>
-    </h2>
+        <div class="sidebar__footer">
+          <label class="theme-toggle">
+            <input id="theme-toggle" type="checkbox" aria-label="Cambiar tema oscuro/claro" />
+            <span class="toggle-track" aria-hidden="true">
+              <span class="toggle-thumb"></span>
+            </span>
+            <span class="toggle-label">Tema oscuro</span>
+          </label>
+        </div>
+      </aside>
 
-    <!-- FORM: agrupa cada opción en un wrapper con ID para poder ocultar/mostrar -->
-    <form id="gameForm" class="card">
-      <div id="group-difficulty" class="form-group">
-        <label for="difficulty">Dificultad</label>
-        <select id="difficulty">
-          <option value="easy">Fácil (gojūon básico)</option>
-          <option value="normal">Normal</option>
-          <option value="hard">Difícil</option>
-        </select>
+      <div class="scrim" id="scrim" hidden></div>
+
+      <div class="main">
+        <header class="topbar">
+          <button
+            id="menu-toggle"
+            class="menu-button"
+            aria-controls="sidebar"
+            aria-expanded="false"
+            aria-label="Abrir menú"
+          >
+            ☰
+          </button>
+          <h1 class="app-title">JP Practice</h1>
+          <div class="spacer"></div>
+          <button
+            id="open-filters"
+            type="button"
+            class="icon-button"
+            aria-label="Configurar práctica"
+            aria-haspopup="dialog"
+            aria-controls="filters-drawer"
+            aria-expanded="false"
+            title="Configurar práctica"
+          >
+            <span aria-hidden="true">⚙</span>
+          </button>
+        </header>
+        <main id="app-main" class="app-main" role="main">
+        <div id="app-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+        <!--
+          <div class="status-item">
+            <span class="label">Modo:</span>
+            <span id="status-mode-legacy" class="value">Básico</span>
+          </div>
+          <div class="status-item">
+            <span class="label">Puntaje:</span>
+            <span id="status-score-legacy" class="value">0</span>
+          </div>
+          <div class="status-item">
+            <span class="label">Combo:</span>
+            <span id="status-combo-legacy" class="value">x0</span>
+          </div>
+        -->
+
+        <!-- Modo de juego como tabs + Botón para configurar filtros -->
+        <nav id="mode-tabs" class="mode-tabs" role="tablist" aria-label="Modo de juego">
+          <div id="modeGrid" class="tabs-list" role="presentation">
+            <button type="button" class="tab-btn mode-card" role="tab" data-mode="classic" aria-selected="false" aria-controls="view-game">Clǭsico</button>
+            <button type="button" class="tab-btn mode-card" role="tab" data-mode="survival" aria-selected="false" aria-controls="view-game">Supervivencia</button>
+            <button type="button" class="tab-btn mode-card" role="tab" data-mode="timeattack" aria-selected="false" aria-controls="view-game">Contrarreloj</button>
+            <button type="button" class="tab-btn mode-card" role="tab" data-mode="choice" aria-selected="false" aria-controls="view-game">Selecci��n mǧltiple</button>
+            <button type="button" class="tab-btn mode-card" role="tab" data-mode="reverse" aria-selected="false" aria-controls="view-game">Inverso</button>
+          </div>
+          <button id="open-filters" type="button" class="secondary-button" aria-haspopup="dialog" aria-controls="filters-drawer">Configurar pr��ctica</button>
+        </nav>
+
+        <!-- Advertencias del pool (sin chips de filtros en el main) -->
+        <div id="pool-warning" class="warning" role="alert" aria-live="assertive"></div>
+
+        <section id="view-home" aria-label="Selecciona un modo de juego">
+          <h1>JP Practice — Hiragana</h1>
+          <p>Elige un modo para comenzar:</p>
+          <div id="modeGridLegacy" class="mode-grid" hidden>
+            <button class="mode-card" data-mode="classic" aria-pressed="false">Tiempo por carácter</button>
+            <button class="mode-card" data-mode="survival" aria-pressed="false">Supervivencia</button>
+            <button class="mode-card" data-mode="timeattack" aria-pressed="false">Contrarreloj</button>
+            <button class="mode-card" data-mode="choice" aria-pressed="false">Selección múltiple</button>
+            <button class="mode-card" data-mode="reverse" aria-pressed="false">Inverso (romaji→kana)</button>
+          </div>
+        </section>
+
+        <section id="view-game" hidden aria-label="Juego">
+          <main class="content" id="content" tabindex="-1">
+          <div id="game" class="card game-card" role="region" aria-label="Área del juego">
+            <div id="game-root"></div>
+          </div>
+          </main>
+        </section>
+        
+        <!-- ActionBar inferior con CTA unificada y chips de estado -->
+        <div class="actionbar" role="region" aria-label="Acciones del juego">
+          <div class="actionbar__left"></div>
+          <div class="actionbar__center">
+            <button id="primary-cta" type="button" class="primary-button" aria-live="polite" aria-controls="game" aria-pressed="false" aria-disabled="true" disabled>Empezar</button>
+          </div>
+          <div class="actionbar__right">
+            <span class="chip" id="score-chip">Puntaje: <strong id="status-score">0</strong></span>
+            <span class="chip" id="combo-chip">Combo: <strong id="status-combo">x0</strong></span>
+            <span id="status-mode" class="sr-only" aria-hidden="true">Básico</span>
+          </div>
+        </div>
+        </main>
       </div>
+  </div>
 
-      <div id="group-timePerChar" class="form-group">
-        <label for="timePerChar">Tiempo por carácter</label>
-        <select id="timePerChar">
-          <option value="10">10 s</option>
-          <option value="7">7 s</option>
-          <option value="5">5 s</option>
-          <option value="3">3 s</option>
-        </select>
+    <!-- Drawer lateral derecho para filtros/configuración -->
+    <div id="filters-overlay" class="drawer-overlay" hidden></div>
+    <aside id="filters-drawer" class="drawer" role="dialog" aria-modal="true" aria-labelledby="filters-title" aria-hidden="true">
+      <header class="drawer__header">
+        <h2 id="filters-title">Configurar práctica</h2>
+        <button id="close-filters" type="button" class="secondary-button" aria-label="Cerrar">Cerrar</button>
+      </header>
+      <div class="drawer__body">
+        <!-- TODO: Se reubicó el formulario de configuración aquí para no romper la lógica existente. -->
+        <form id="settings-form" class="settings-form" autocomplete="off">
+          <div class="field">
+            <label for="cfg-duration" class="field-label">Duración (min)</label>
+            <div class="field-control">
+              <input id="cfg-duration" type="range" min="1" max="10" step="1" value="3" />
+              <output id="cfg-duration-value" for="cfg-duration">3</output>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="cfg-char-time" class="field-label">Tiempo por carácter</label>
+            <div class="field-control inline">
+              <input id="cfg-char-time" type="number" value="10" min="10" max="10" disabled />
+              <span class="unit">s</span>
+            </div>
+          </div>
+
+          <fieldset class="field">
+            <legend class="field-label">Sets</legend>
+            <ul class="checklist">
+              <li><label><input type="checkbox" id="set-gojuon" data-set="gojuon" checked /> Gojuon</label></li>
+              <li><label><input type="checkbox" id="set-dakuten" data-set="dakuten" /> Dakuten</label></li>
+              <li><label><input type="checkbox" id="set-handakuten" data-set="handakuten" /> Handakuten</label></li>
+              <li><label><input type="checkbox" id="set-youon" data-set="youon" /> Yoon</label></li>
+              <li><label><input type="checkbox" id="set-small" data-set="small" /> Pequeños</label></li>
+              <li><label><input type="checkbox" id="set-sokuon" data-set="sokuon" checked /> っ (sokuon)</label></li>
+              <li><label><input type="checkbox" id="set-n" data-set="n" checked /> ん</label></li>
+            </ul>
+          </fieldset>
+
+          <div class="field">
+            <label class="checkbox-row"><input id="cfg-hepburn" type="checkbox" /> Hepburn estricto</label>
+          </div>
+          <div class="field">
+            <label class="checkbox-row"><input id="cfg-vibration" type="checkbox" /> Vibración</label>
+          </div>
+          <div class="field">
+            <label class="checkbox-row"><input id="cfg-sound" type="checkbox" /> Sonido</label>
+          </div>
+
+          <fieldset class="field">
+            <legend class="field-label">Accesibilidad</legend>
+            <div class="field">
+              <label class="checkbox-row"><input id="cfg-contrast" type="checkbox" /> Alto contraste</label>
+            </div>
+            <div class="field">
+              <label for="cfg-font-scale" class="field-label">Tamaño de fuente</label>
+              <div class="field-control">
+                <input id="cfg-font-scale" type="range" min="90" max="120" step="5" value="100" />
+                <output id="cfg-font-scale-value" for="cfg-font-scale">100%</output>
+              </div>
+            </div>
+          </fieldset>
+
+          <details id="advanced" class="advanced">
+            <summary class="advanced__summary">Avanzada</summary>
+            <div class="advanced__body">
+              <div class="field">
+                <label class="checkbox-row"><input id="cfg-adv-enabled" type="checkbox" /> Activar configuración avanzada</label>
+              </div>
+
+              <fieldset class="field">
+                <legend class="field-label">Modo</legend>
+                <label class="radio-row"><input type="radio" name="adv-mode" id="cfg-adv-mode-whitelist" value="whitelist" checked /> Whitelist</label>
+                <label class="radio-row"><input type="radio" name="adv-mode" id="cfg-adv-mode-blacklist" value="blacklist" /> Blacklist</label>
+              </fieldset>
+
+              <div class="field">
+                <label for="cfg-adv-search" class="field-label">Buscar (kana o romaji)</label>
+                <input id="cfg-adv-search" type="search" placeholder="あ- / shi / kya" />
+              </div>
+
+              <div class="quick-controls">
+                <div class="chips-group" aria-label="Gojuon filas">
+                  <span class="chips-label">Filas:</span>
+                  <button type="button" class="chip" data-row="k">K</button>
+                  <button type="button" class="chip" data-row="s">S</button>
+                  <button type="button" class="chip" data-row="t">T</button>
+                  <button type="button" class="chip" data-row="n">N</button>
+                  <button type="button" class="chip" data-row="h">H</button>
+                  <button type="button" class="chip" data-row="m">M</button>
+                  <button type="button" class="chip" data-row="y">Y</button>
+                  <button type="button" class="chip" data-row="r">R</button>
+                  <button type="button" class="chip" data-row="w">W</button>
+                </div>
+                <div class="chips-group" aria-label="Gojuon columnas">
+                  <span class="chips-label">Columnas:</span>
+                  <button type="button" class="chip" data-col="a">a</button>
+                  <button type="button" class="chip" data-col="i">i</button>
+                  <button type="button" class="chip" data-col="u">u</button>
+                  <button type="button" class="chip" data-col="e">e</button>
+                  <button type="button" class="chip" data-col="o">o</button>
+                </div>
+                <div class="chips-group" aria-label="Grupos">
+                  <span class="chips-label">Grupos:</span>
+                  <button type="button" class="chip" data-group="gojuon">Gojuon</button>
+                  <button type="button" class="chip" data-group="dakuten">Dakuten</button>
+                  <button type="button" class="chip" data-group="handakuten">Handakuten</button>
+                  <button type="button" class="chip" data-group="youon">Yoon</button>
+                  <button type="button" class="chip" data-group="specials">Especiales</button>
+                  <button type="button" class="chip" data-action="select-all">Todo</button>
+                  <button type="button" class="chip" data-action="clear-all">Nada</button>
+                  <button type="button" class="chip" data-action="invert">Invertir</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <span class="chips-label">Seleccionados: <strong id="adv-selected-count">0</strong></span>
+              </div>
+
+              <div id="adv-kana-list" class="kana-grid" aria-label="Lista de kana"></div>
+
+              <div class="field actions">
+                <button type="button" id="adv-boost-mistakes" class="secondary-button" title="Requiere estadísticas" disabled>Asignar más peso a mis fallos</button>
+                <div class="spacer"></div>
+                <button type="button" id="settings-save" class="secondary-button">Guardar</button>
+                <button type="button" id="settings-reset" class="secondary-button">Restablecer</button>
+              </div>
+
+              <fieldset class="field preset">
+                <legend class="field-label">Presets</legend>
+                <div class="preset-row">
+                  <input id="preset-name" type="text" placeholder="Nombre del preset" />
+                  <button type="button" id="preset-save" class="secondary-button">Guardar como preset</button>
+                </div>
+                <div class="preset-row">
+                  <select id="preset-select"></select>
+                  <button type="button" id="preset-load" class="secondary-button">Cargar</button>
+                  <button type="button" id="preset-delete" class="secondary-button">Eliminar</button>
+                </div>
+              </fieldset>
+
+              <div class="field">
+                <button type="button" id="adv-reset-selection" class="secondary-button">Restablecer selección</button>
+              </div>
+            </div>
+          </details>
+
+          <div class="field actions">
+            <button type="button" id="drawer-apply" class="primary-button">Aplicar</button>
+            <button type="button" id="drawer-cancel" class="secondary-button">Cancelar</button>
+            <div class="spacer"></div>
+            <button type="button" id="drawer-reset" class="secondary-button">Restablecer</button>
+          </div>
+
+          <div id="settings-status" class="sr-only" aria-live="polite"></div>
+        </form>
       </div>
+    </aside>
 
-      <div id="group-totalTime" class="form-group">
-        <label for="totalTime">Tiempo total (s)</label>
-        <input id="totalTime" type="number" min="10" step="5" value="60" />
-      </div>
+    <script type="module" src="./js/main.js"></script>
+  </body>
+  </html>
 
-      <div id="group-lives" class="form-group">
-        <label for="lives">Vidas</label>
-        <select id="lives">
-          <option value="3">3</option>
-          <option value="5">5</option>
-          <option value="∞">∞</option>
-        </select>
-      </div>
 
-      <!-- Ejemplo de switches extra -->
-      <fieldset id="group-switches" class="form-group">
-        <legend>Contras/sets</legend>
-        <label class="switch">
-          <input type="checkbox" id="useDigraphs" /> <span>Consonante+vocal (shi/chi/…)</span>
-        </label>
-        <label class="switch">
-          <input type="checkbox" id="useVoiced" /> <span>Sonidos sonoros (ga/za/…)</span>
-        </label>
-      </fieldset>
 
-      <button id="startBtn" type="button" class="primary">Comenzar</button>
-    </form>
-  </main>
 
-  <script src="app.js"></script>
-</body>
-</html>
+
+

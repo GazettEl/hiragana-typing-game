@@ -1,45 +1,45 @@
-# Hiragana Rush — Typing Trainer
+JP Practice — Hiragana Typing (UI Refresh)
 
-Juego web para practicar Hiragana. 100% estático (HTML/CSS/JS), compatible con GitHub Pages.
+Overview
+- The main area has been restructured for clarity and accessibility without changing the game logic.
+- New components: mode tabs (segmented control), active filter chips, right-side filters drawer, and a bottom ActionBar with a single primary CTA.
 
-## Estructura
-```
-index.html
-styles.css
-main.js
-data/hiragana.json
-```
+Key Mount Points
+- main app: `main#app-main` contains, in order: mode tabs (`#mode-tabs`), active filters chips (`#active-filters`) and warnings (`#pool-warning`), the content views (`#view-home` and `#view-game`), and the bottom ActionBar.
+- game content: `#game-root` is unchanged; modes mount here as before.
+- primary CTA: `#primary-cta` is the unified game control button. For compatibility, JS resolves `#startBtn` OR `#primary-cta` (alias added in `js/main.js`).
+- status chips: `#status-score` and `#status-combo` now live inside ActionBar chips (`#score-chip`, `#combo-chip`). The legacy `#status-mode` is kept as an sr-only element for compatibility and not shown in the UI.
 
-## Cómo correr local
-Opción 1 (Python 3):
-```bash
-python -m http.server 8000
-# visita http://localhost:8000
-```
+Mode Selector
+- Replaced the old mode cards grid with accessible tabs at the top (`#mode-tabs` + `#modeGrid`).
+- Tabs use `role="tab"` and set `aria-selected`. Existing code also tolerates `aria-pressed` for legacy buttons.
+- Selecting a mode sets `settings.game.mode` and keeps state in `localStorage`.
 
-## Publicar en GitHub Pages
-1. Sube estos archivos a tu repo (rama `main`).
-2. En **Settings → Pages**, elige **Source: Deploy from a branch**, Branch: `main`, Folder: `/root` (o `/docs` si los pones ahí).
-3. Espera a que GitHub genere la página y visita la URL.
+Filters Drawer
+- Button: `#open-filters` (alongside the tabs) opens the right drawer `#filters-drawer`.
+- Drawer is a `role="dialog"` with `aria-modal="true"` and focus trap. Close via `#close-filters`, overlay click (`#filters-overlay`) or `Esc`.
+- The full `#settings-form` moved into the drawer. IDs remain unchanged so existing bindings keep working. The sidebar now shows a small note instead.
 
-## Mecánicas
-- Modo **Supervivencia** (3 vidas) y **Contrarreloj** (60s).
-- **Tiempo por carácter** configurable (6/8/10/12s).
-- **Permisivo** (acepta equivalencias como `shi/si`, `chi/ti`, `tsu/tu`, etc.).
-- Dificultad **Fácil/Medio/Difícil**: controlan el pool (gojūon básico → +dakuten → +yōon).
-- Puntaje con multiplicador por combo (1 extra cada 10 aciertos seguidos).
-- Récords locales con `localStorage` (Top 5 por modo/dificultad/tiempo).
+ActionBar
+- Fixed to the bottom of the main area. Center: `#primary-cta` (labels change as the FSM moves: Empezar → Pausar/Reanudar → Terminar → Reiniciar). Right: score/combo chips.
+- Minimum width ≈280px on desktop and full-width on mobile.
 
-## Notas
-- Usa **rutas relativas** (`./data/hiragana.json`), por lo que funciona también cuando tu sitio está en `/usuario/repositorio/`.
-- Si abres el `index.html` directamente con doble click (file://), el `fetch` de `hiragana.json` puede fallar. Sirve los archivos con un server local o súbelos a GitHub Pages.
+A11y
+- Tabs: `role="tablist"`, tabs `role="tab"`, `aria-selected`, `aria-controls` (points to `#view-game`).
+- Drawer: `role="dialog"`, `aria-modal="true"`, `aria-labelledby="filters-title"`; focus trap; `Esc` closes.
+- Primary CTA has `aria-live="polite"` to announce label changes.
+- Feedback regions are preserved (`aria-live="polite"`).
+
+Notes for Extending
+- Add a new mode tab by appending a button inside `#modeGrid` with `data-mode="your-mode"`. The existing click delegation in `js/main.js` will save it to state. Wire the actual mode under `js/modes/` as today.
+- Add new filters inside `#settings-form` in the drawer. Keep unique IDs and hook into `bindSettingsUI()` in `js/main.js` if needed.
+
+Dev Comments
+- // TODO comments were added in `js/main.js` near the alias for `#primary-cta` and the new drawer bindings so the team can quickly spot the changes.
 
 
-## PWA (offline)
-- Incluye `manifest.webmanifest` e `icons`.
-- `service-worker.js` cachea los archivos para jugar offline (cache-first para assets).
-- Al actualizar, cambia `CACHE_NAME` en `service-worker.js` para forzar la recarga del caché.
-
-## Sonidos y tema
-- Sonidos (WebAudio) con toggle en la pantalla inicial.
-- Tema: **Auto/Oscuro/Claro**; se guarda en `localStorage` y usa `prefers-color-scheme` en modo Auto.
+UI Map (Post-removal)
+- Main layout: `#mode-tabs` → `#pool-warning` → content views (`#view-home` | `#view-game` mounting into `#game-root`) → bottom ActionBar.
+- Settings drawer: open via top-right gear `#open-filters`; `#filters-drawer` with focus trap (`Esc` closes), overlay, and persistence in localStorage.
+- Status display: only chips on the ActionBar right (`#status-score`, `#status-combo`). No statusbar in the main; no active filter chips in the main.
+- Announcements: `#app-live` inside `main#app-main` announces start/pause/resume/stop.
